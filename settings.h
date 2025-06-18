@@ -39,7 +39,7 @@
 #define ENCODER_N_SETTINGS_MAX 5 // NOTE: This is the maximum number of encoders allowed.
 #define ENCODER_SETTINGS_INCREMENT 10
 
-#define SETTINGS_HARD_RESET_REQUIRED "\\n\\nNOTE: A hard reset of the controller is required after changing this setting."
+#define SETTINGS_HARD_RESET_REQUIRED "NOTE: A hard reset of the controller is required after changing this setting."
 
 #define PASSWORD_MASK "********"
 

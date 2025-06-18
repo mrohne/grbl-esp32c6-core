@@ -820,8 +820,9 @@ static void protocol_exec_rt_suspend (sys_state_t state)
 // These characters are not passed into the main buffer,
 // but rather sets system state flag bits for later execution by protocol_exec_rt_system().
 // Called from input stream interrupt handler.
-ISR_CODE bool ISR_FUNC(protocol_enqueue_realtime_command)(char c)
+ISR_CODE bool ISR_FUNC(protocol_enqueue_realtime_command)(char s)
 {
+    unsigned char c = (unsigned char)s;
     static bool esc = false;
 
     bool drop = false;

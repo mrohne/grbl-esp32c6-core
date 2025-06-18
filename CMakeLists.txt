@@ -1,5 +1,9 @@
 add_library(grbl INTERFACE)
 
+target_include_directories(grbl INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
+)
+
 target_sources(grbl INTERFACE
  ${CMAKE_CURRENT_LIST_DIR}/grbllib.c
  ${CMAKE_CURRENT_LIST_DIR}/coolant_control.c

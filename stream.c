@@ -20,6 +20,7 @@
 */
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "hal.h"
@@ -121,8 +122,9 @@ int16_t stream_get_null (void)
     return SERIAL_NO_DATA;
 }
 
-ISR_CODE static bool ISR_FUNC(await_toolchange_ack)(char c)
+ISR_CODE static bool ISR_FUNC(await_toolchange_ack)(char s)
 {
+    unsigned char c = (unsigned char) s;
     if(c == CMD_TOOL_ACK && !stream.rxbuffer->backup) {
         memcpy(&rxbackup, stream.rxbuffer, sizeof(stream_rx_buffer_t));
         stream.rxbuffer->backup = true;
@@ -166,9 +168,10 @@ ISR_CODE bool ISR_FUNC(stream_buffer_all)(char c)
     return false;
 }
 
-ISR_CODE bool ISR_FUNC(stream_enqueue_realtime_command)(char c)
+ISR_CODE bool ISR_FUNC(stream_enqueue_realtime_command)(char s)
 {
-	bool drop = hal.stream.enqueue_rt_command ? hal.stream.enqueue_rt_command(c) : protocol_enqueue_realtime_command(c);
+    unsigned char c = (unsigned char)s;
+    bool drop = hal.stream.enqueue_rt_command ? hal.stream.enqueue_rt_command(c) : protocol_enqueue_realtime_command(c);
 
     if(drop && (c == CMD_CYCLE_START || c == CMD_CYCLE_START_LEGACY))
         sys.report.cycle_start = settings.status_report.pin_state;
@@ -466,8 +469,9 @@ void stream_mpg_set_mode (void *data)
     stream_mpg_enable(data != NULL);
 }
 
-ISR_CODE bool ISR_FUNC(stream_mpg_check_enable)(char c)
+ISR_CODE bool ISR_FUNC(stream_mpg_check_enable)(char s)
 {
+    unsigned char c = (unsigned char)s;
     if(c == CMD_MPG_MODE_TOGGLE)
     	task_add_immediate(stream_mpg_set_mode, (void *)1);
     else {
@@ -523,7 +527,7 @@ bool stream_mpg_register (const io_stream_t *stream, bool rx_only, stream_write_
 
 static void report_mpg_mode (void *data)
 {
-    protocol_enqueue_realtime_command((char)((uint32_t)data));
+    protocol_enqueue_realtime_command((char)((uintptr_t)data));
 }
 
 bool stream_mpg_enable (bool on)
@@ -576,7 +580,7 @@ bool stream_mpg_enable (bool on)
     system_add_rt_report(Report_MPGMode);
 
     // Force a realtime status report, all reports when MPG mode active
-    task_add_delayed(report_mpg_mode, (void *)(on ? CMD_STATUS_REPORT_ALL : CMD_STATUS_REPORT), 5);
+    task_add_delayed(report_mpg_mode, (void *)(uintptr_t)(on ? CMD_STATUS_REPORT_ALL : CMD_STATUS_REPORT), 5);
 
     return true;
 }

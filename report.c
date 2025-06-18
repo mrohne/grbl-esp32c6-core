@@ -1666,7 +1666,7 @@ static void report_settings_detail (settings_format_t format, const setting_deta
                     if(setting->flags.reboot_required) {
                         if(description && *description != '\0')
                             hal.stream.write(ASCII_EOL ASCII_EOL);
-                        hal.stream.write(SETTINGS_HARD_RESET_REQUIRED + 4);
+                        hal.stream.write(SETTINGS_HARD_RESET_REQUIRED);
                     }
                 }
 #endif
@@ -1818,7 +1818,9 @@ static void report_settings_detail (settings_format_t format, const setting_deta
                 const char *description = setting_get_description((setting_id_t)(setting->id + offset));
                 hal.stream.write(description ? description : "");
                 if(setting->flags.reboot_required)
-                    hal.stream.write(SETTINGS_HARD_RESET_REQUIRED + (description && *description != '\0' ? 0 : 4));
+                  hal.stream.write((!description && !*description) ?
+                                   ASCII_EOL ASCII_EOL SETTINGS_HARD_RESET_REQUIRED : 
+                                   SETTINGS_HARD_RESET_REQUIRED);
     #endif
                 hal.stream.write("\t");
 
@@ -1962,8 +1964,9 @@ status_code_t report_setting_description (settings_format_t format, setting_id_t
     //    hal.stream.write(description == NULL ? (is_setting_available(setting_get_details(id, NULL)) ? "" : "N/A") : description); // TODO?
         hal.stream.write(description ? description : (setting ? "" : "N/A"));
         if(setting && setting->flags.reboot_required)
-            hal.stream.write(SETTINGS_HARD_RESET_REQUIRED + (description && *description != '\0' ? 0 : 4));
-
+          hal.stream.write((!description && !*description) ?
+                           ASCII_EOL ASCII_EOL SETTINGS_HARD_RESET_REQUIRED :
+                           SETTINGS_HARD_RESET_REQUIRED);
         if(format == SettingsFormat_MachineReadable)
             hal.stream.write("]" ASCII_EOL);
     }
