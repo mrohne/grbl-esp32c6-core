@@ -243,7 +243,7 @@ static alarm_code_t report_alarm_message (alarm_code_t alarm_code)
 // Prints feedback message, typically from gcode.
 void report_message (const char *msg, message_type_t type)
 {
-    if(hal.stream.is_connected()) {
+    if(hal.stream.is_connected && hal.stream.is_connected()) {
 
         hal.stream.write("[MSG:");
 
